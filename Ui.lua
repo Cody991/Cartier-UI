@@ -199,8 +199,8 @@ local ContentContainer = Create("ScrollingFrame", {
     Size = UDim2.new(1, -160, 1, -40),
     ScrollBarThickness = 3,
     ScrollBarImageColor3 = Theme.Colors.Accent,
-    Visible = false,
-    CanvasSize = UDim2.new(0, 0, 0, 0)
+    CanvasSize = UDim2.new(0, 0, 0, 0),
+    Visible = true  -- Make sure it's visible
 })
 local ContentGradient = Create("UIGradient", {
     Parent = ContentContainer,
@@ -289,7 +289,7 @@ function Library:CreateTab(name, icon)
         Size = UDim2.new(1, 0, 1, 0),
         ScrollBarThickness = 3,
         ScrollBarImageColor3 = Theme.Colors.Accent,
-        Visible = false,
+        Visible = true,  -- Make container visible
         CanvasSize = UDim2.new(0, 0, 0, 0)
     })
     local ElementList = Create("UIListLayout", {
@@ -319,13 +319,11 @@ function Library:CreateTab(name, icon)
             Name = "Slider",
             Parent = Container,
             BackgroundColor3 = Theme.Colors.SliderBg,
-            Size = UDim2.new(1, -20, 0, 65),
-            Position = UDim2.new(0, 10, 0, 5)
+            Size = UDim2.new(1, 0, 0, 65),
+            Visible = true  -- Make sure slider is visible
         })
-        local SliderCorner = Create("UICorner", {
-            Parent = Slider,
-            CornerRadius = UDim.new(0, Theme.CornerRadius - 2)
-        })
+
+        -- Add slider title
         local Title = Create("TextLabel", {
             Parent = Slider,
             BackgroundTransparency = 1,
@@ -337,67 +335,42 @@ function Library:CreateTab(name, icon)
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left
         })
-        local ValueDisplay = Create("TextLabel", {
-            Parent = Slider,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(1, -55, 0, 8),
-            Size = UDim2.new(0, 45, 0, 20),
-            Font = Enum.Font.GothamBold,
-            Text = tostring(info.CurrentValue),
-            TextColor3 = Theme.Colors.Accent,
-            TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Right
-        })
+
+        -- Add slider bar
         local SliderBar = Create("Frame", {
             Parent = Slider,
             BackgroundColor3 = Theme.Colors.SliderBg,
             Position = UDim2.new(0, 12, 0, 40),
             Size = UDim2.new(1, -24, 0, 6)
         })
-        local SliderBarCorner = Create("UICorner", {
-            Parent = SliderBar,
-            CornerRadius = UDim.new(1, 0)
-        })
+
+        -- Add slider fill
         local Fill = Create("Frame", {
             Parent = SliderBar,
             BackgroundColor3 = Theme.Colors.Accent,
             Size = UDim2.new(0.5, 0, 1, 0)
         })
-        local FillCorner = Create("UICorner", {
-            Parent = Fill,
-            CornerRadius = UDim.new(1, 0)
-        })
-        local Hover = Create("Frame", {
-            Parent = Slider,
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 0.9,
-            Size = UDim2.new(1, 0, 1, 0),
-            Visible = false
-        })
-        local HoverCorner = Create("UICorner", {
-            Parent = Hover,
-            CornerRadius = UDim.new(0, Theme.CornerRadius - 2)
-        })
 
-        local min = info.Range[1] or 0
-        local max = info.Range[2] or 100
-        local default = math.clamp(info.CurrentValue or min, min, max)
-        
-        local function update(input)
-            local posX = math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
-            Fill.Size = UDim2.new(posX, 0, 1, 0)
-            local value = math.floor(min + ((max - min) * posX))
-            ValueDisplay.Text = tostring(value)
+        -- Add corners
+        Create("UICorner", { Parent = Slider, CornerRadius = UDim.new(0, 6) })
+        Create("UICorner", { Parent = SliderBar, CornerRadius = UDim.new(1, 0) })
+        Create("UICorner", { Parent = Fill, CornerRadius = UDim.new(1, 0) })
+
+        -- Slider functionality
+        local function updateSlider(input)
+            local pos = math.clamp((input.Position.X - SliderBar.AbsolutePosition.X) / SliderBar.AbsoluteSize.X, 0, 1)
+            Fill.Size = UDim2.new(pos, 0, 1, 0)
+            local value = math.floor(info.Range[1] + ((info.Range[2] - info.Range[1]) * pos))
             info.Callback(value)
         end
 
         SliderBar.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                update(input)
+                updateSlider(input)
                 local connection
                 connection = UserInputService.InputChanged:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseMovement then
-                        update(input)
+                        updateSlider(input)
                     end
                 end)
                 UserInputService.InputEnded:Connect(function(input)
@@ -414,13 +387,11 @@ function Library:CreateTab(name, icon)
             Name = "Toggle",
             Parent = Container,
             BackgroundColor3 = Theme.Colors.ToggleBg,
-            Size = UDim2.new(1, -20, 0, 50),
-            Position = UDim2.new(0, 10, 0, 5)
+            Size = UDim2.new(1, 0, 0, 50),
+            Visible = true  -- Make sure toggle is visible
         })
-        local ToggleCorner = Create("UICorner", {
-            Parent = Toggle,
-            CornerRadius = UDim.new(0, Theme.CornerRadius - 2)
-        })
+
+        -- Add toggle title
         local Title = Create("TextLabel", {
             Parent = Toggle,
             BackgroundTransparency = 1,
@@ -432,54 +403,40 @@ function Library:CreateTab(name, icon)
             TextSize = 13,
             TextXAlignment = Enum.TextXAlignment.Left
         })
+
+        -- Add toggle switch
         local Switch = Create("TextButton", {
             Parent = Toggle,
-            BackgroundColor3 = Color3.fromRGB(40, 40, 45),
+            BackgroundColor3 = Theme.Colors.SwitchOff,
             Position = UDim2.new(1, -52, 0.5, -10),
             Size = UDim2.new(0, 40, 0, 20),
             Text = "",
             AutoButtonColor = false
         })
-        local SwitchCorner = Create("UICorner", {
-            Parent = Switch,
-            CornerRadius = UDim.new(1, 0)
-        })
+
+        -- Add toggle circle
         local Circle = Create("Frame", {
             Parent = Switch,
             BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             Position = UDim2.new(0, 2, 0.5, -8),
             Size = UDim2.new(0, 16, 0, 16)
         })
-        local CircleCorner = Create("UICorner", {
-            Parent = Circle,
-            CornerRadius = UDim.new(1, 0)
-        })
-        local Hover = Create("Frame", {
-            Parent = Toggle,
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-            BackgroundTransparency = 0.9,
-            Size = UDim2.new(1, 0, 1, 0),
-            Visible = false
-        })
-        local HoverCorner = Create("UICorner", {
-            Parent = Hover,
-            CornerRadius = UDim.new(0, Theme.CornerRadius - 2)
-        })
 
+        -- Add corners
+        Create("UICorner", { Parent = Toggle, CornerRadius = UDim.new(0, 6) })
+        Create("UICorner", { Parent = Switch, CornerRadius = UDim.new(1, 0) })
+        Create("UICorner", { Parent = Circle, CornerRadius = UDim.new(1, 0) })
+
+        -- Toggle functionality
         local toggled = info.Default or false
-        local function updateToggle()
+        Switch.MouseButton1Click:Connect(function()
             toggled = not toggled
-            local targetPos = toggled and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
-            Tween(Circle, TweenInfo.new(0.2), {Position = targetPos})
-            local targetColor = toggled and Theme.Colors.SwitchOn or Theme.Colors.SwitchOff
-            Tween(Switch, TweenInfo.new(0.2), {BackgroundColor3 = targetColor})
+            local pos = toggled and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
+            local color = toggled and Theme.Colors.SwitchOn or Theme.Colors.SwitchOff
+            Circle:TweenPosition(pos, "Out", "Sine", 0.2, true)
+            Switch:TweenSize(UDim2.new(0, 40, 0, 20), "Out", "Sine", 0.2, true)
             info.Callback(toggled)
-        end
-
-        Switch.MouseButton1Click:Connect(updateToggle)
-        if toggled then
-            updateToggle()
-        end
+        end)
     end
 
     Library.Tabs[name] = {
