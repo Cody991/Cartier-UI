@@ -32,9 +32,9 @@ local ScreenGui = Create("ScreenGui", {
 })
 
 local MainFrame = Create("Frame", {
-    Name = "MainFrame",
+    Name = "MainFrame", 
     Parent = ScreenGui,
-    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
     BorderSizePixel = 0,
     Position = UDim2.new(0.5, -300, 0.5, -175),
     Size = UDim2.new(0, 600, 0, 350),
@@ -44,7 +44,7 @@ local MainFrame = Create("Frame", {
 -- Add Shadow and Rounding
 local Corner = Create("UICorner", {
     Parent = MainFrame,
-    CornerRadius = UDim.new(0, 8)
+    CornerRadius = UDim.new(0, 10)
 })
 
 local Shadow = Create("ImageLabel", {
@@ -54,64 +54,99 @@ local Shadow = Create("ImageLabel", {
     Size = UDim2.new(1, 30, 1, 30),
     Image = "rbxassetid://5554236805",
     ImageColor3 = Color3.fromRGB(0, 0, 0),
-    ImageTransparency = 0.6,
+    ImageTransparency = 0.5,
     ScaleType = Enum.ScaleType.Slice,
     SliceCenter = Rect.new(23, 23, 277, 277),
     SliceScale = 1
 })
 
--- Title Bar
+-- Title Bar with gradient
 local TitleBar = Create("Frame", {
     Name = "TitleBar",
     Parent = MainFrame,
-    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
     BorderSizePixel = 0,
-    Size = UDim2.new(1, 0, 0, 30)
+    Size = UDim2.new(1, 0, 0, 35)
+})
+
+local TitleGradient = Create("UIGradient", {
+    Parent = TitleBar,
+    Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 25, 25))
+    }),
+    Rotation = 90
 })
 
 Create("UICorner", {
     Parent = TitleBar,
-    CornerRadius = UDim.new(0, 8)
+    CornerRadius = UDim.new(0, 10)
 })
 
 local Title = Create("TextLabel", {
     Parent = TitleBar,
     BackgroundTransparency = 1,
-    Position = UDim2.new(0, 10, 0, 0),
-    Size = UDim2.new(1, -20, 1, 0),
+    Position = UDim2.new(0, 15, 0, 0),
+    Size = UDim2.new(1, -30, 1, 0),
     Font = Enum.Font.GothamBold,
     Text = "Serenity Hub",
     TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 14,
+    TextSize = 16,
     TextXAlignment = Enum.TextXAlignment.Left
 })
 
--- Tab Container
+-- Tab Container with gradient
 local TabContainer = Create("ScrollingFrame", {
     Name = "TabContainer",
     Parent = MainFrame,
-    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
     BorderSizePixel = 0,
-    Position = UDim2.new(0, 0, 0, 30),
-    Size = UDim2.new(0, 120, 1, -30),
-    ScrollBarThickness = 0,
+    Position = UDim2.new(0, 0, 0, 35),
+    Size = UDim2.new(0, 130, 1, -35),
+    ScrollBarThickness = 2,
+    ScrollBarImageColor3 = Color3.fromRGB(75, 75, 75),
     CanvasSize = UDim2.new(0, 0, 0, 0)
+})
+
+local TabGradient = Create("UIGradient", {
+    Parent = TabContainer,
+    Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(25, 25, 25))
+    }),
+    Rotation = 90
 })
 
 local TabList = Create("UIListLayout", {
     Parent = TabContainer,
     SortOrder = Enum.SortOrder.LayoutOrder,
-    Padding = UDim.new(0, 5)
+    Padding = UDim.new(0, 8)
+})
+
+local TabPadding = Create("UIPadding", {
+    Parent = TabContainer,
+    PaddingTop = UDim.new(0, 8),
+    PaddingLeft = UDim.new(0, 8),
+    PaddingRight = UDim.new(0, 8)
 })
 
 -- Content Container
 local ContentContainer = Create("Frame", {
     Name = "ContentContainer",
     Parent = MainFrame,
-    BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
     BorderSizePixel = 0,
-    Position = UDim2.new(0, 120, 0, 30),
-    Size = UDim2.new(1, -120, 1, -30)
+    Position = UDim2.new(0, 130, 0, 35),
+    Size = UDim2.new(1, -130, 1, -35)
+})
+
+local ContentGradient = Create("UIGradient", {
+    Parent = ContentContainer,
+    Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 35)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(30, 30, 30))
+    }),
+    Rotation = 90
 })
 
 -- Make GUI Draggable
@@ -147,10 +182,35 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
--- Toggle GUI Visibility
+-- Toggle GUI Visibility with smooth fade
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Library.ToggleKey then
-        ScreenGui.Enabled = not ScreenGui.Enabled
+        if ScreenGui.Enabled then
+            Tween(MainFrame, TweenInfo.new(0.2), {BackgroundTransparency = 1})
+            for _, obj in pairs(MainFrame:GetDescendants()) do
+                if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                    Tween(obj, TweenInfo.new(0.2), {BackgroundTransparency = 1, TextTransparency = 1, ImageTransparency = 1})
+                end
+            end
+            wait(0.2)
+            ScreenGui.Enabled = false
+        else
+            ScreenGui.Enabled = true
+            MainFrame.BackgroundTransparency = 1
+            for _, obj in pairs(MainFrame:GetDescendants()) do
+                if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                    obj.BackgroundTransparency = 1
+                    obj.TextTransparency = 1
+                    obj.ImageTransparency = 1
+                end
+            end
+            Tween(MainFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0})
+            for _, obj in pairs(MainFrame:GetDescendants()) do
+                if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                    Tween(obj, TweenInfo.new(0.2), {BackgroundTransparency = 0, TextTransparency = 0, ImageTransparency = obj:GetAttribute("DefaultTransparency") or 0})
+                end
+            end
+        end
     end
 end)
 
@@ -163,20 +223,32 @@ function Library:CreateTab(name, icon)
     local Tab = Create("TextButton", {
         Name = name,
         Parent = TabContainer,
-        BackgroundColor3 = Color3.fromRGB(40, 40, 40),
-        Size = UDim2.new(1, -10, 0, 30),
-        Position = UDim2.new(0, 5, 0, 5),
-        Font = Enum.Font.Gotham,
+        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+        Size = UDim2.new(1, 0, 0, 35),
+        Font = Enum.Font.GothamSemibold,
         Text = name,
         TextColor3 = Color3.fromRGB(255, 255, 255),
-        TextSize = 12,
+        TextSize = 14,
         AutoButtonColor = false
     })
 
     Create("UICorner", {
         Parent = Tab,
-        CornerRadius = UDim.new(0, 6)
+        CornerRadius = UDim.new(0, 8)
     })
+
+    if icon then
+        local Icon = Create("ImageLabel", {
+            Parent = Tab,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 8, 0.5, -10),
+            Size = UDim2.new(0, 20, 0, 20),
+            Image = "rbxassetid://" .. icon,
+            ImageColor3 = Color3.fromRGB(255, 255, 255)
+        })
+        Tab.TextXAlignment = Enum.TextXAlignment.Right
+        Tab.Text = "  " .. name
+    end
 
     local Container = Create("ScrollingFrame", {
         Name = name.."Container",
@@ -184,7 +256,7 @@ function Library:CreateTab(name, icon)
         BackgroundTransparency = 1,
         Size = UDim2.new(1, 0, 1, 0),
         ScrollBarThickness = 3,
-        ScrollBarImageColor3 = Color3.fromRGB(70, 70, 70),
+        ScrollBarImageColor3 = Color3.fromRGB(75, 75, 75),
         Visible = false,
         CanvasSize = UDim2.new(0, 0, 0, 0)
     })
@@ -192,58 +264,61 @@ function Library:CreateTab(name, icon)
     local ElementList = Create("UIListLayout", {
         Parent = Container,
         SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 5)
+        Padding = UDim.new(0, 8)
     })
 
     local ElementPadding = Create("UIPadding", {
         Parent = Container,
-        PaddingLeft = UDim.new(0, 10),
-        PaddingRight = UDim.new(0, 10),
-        PaddingTop = UDim.new(0, 10)
+        PaddingLeft = UDim.new(0, 15),
+        PaddingRight = UDim.new(0, 15),
+        PaddingTop = UDim.new(0, 15)
     })
 
     Tab.MouseButton1Click:Connect(function()
         for _, t in pairs(Library.Tabs) do
             t.Container.Visible = false
-            Tween(t.Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)})
+            Tween(t.Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 35, 35)})
         end
         Container.Visible = true
-        Tween(Tab, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 50)})
+        Tween(Tab, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)})
     end)
 
     local TabFunctions = {}
 
     function TabFunctions:CreateSlider(info)
-        local min = info.Min or 0
-        local max = info.Max or 100
-        local default = math.clamp(info.Default or min, min, max)
+        local min = info.Range[1] or 0
+        local max = info.Range[2] or 100
+        local default = math.clamp(info.CurrentValue or min, min, max)
         
         local Slider = Create("Frame", {
             Name = "Slider",
             Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(40, 40, 40),
-            Size = UDim2.new(1, 0, 0, 50)
+            BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+            Size = UDim2.new(1, 0, 0, 55)
         })
 
-        Create("UICorner", {Parent = Slider})
+        Create("UICorner", {
+            Parent = Slider,
+            CornerRadius = UDim.new(0, 8)
+        })
 
         local Title = Create("TextLabel", {
             Parent = Slider,
             BackgroundTransparency = 1,
-            Position = UDim2.new(0, 10, 0, 5),
-            Size = UDim2.new(1, -20, 0, 20),
-            Font = Enum.Font.Gotham,
+            Position = UDim2.new(0, 12, 0, 8),
+            Size = UDim2.new(1, -24, 0, 20),
+            Font = Enum.Font.GothamSemibold,
             Text = info.Name,
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextSize = 12,
+            TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left
         })
 
         local SliderBar = Create("Frame", {
             Parent = Slider,
-            BackgroundColor3 = Color3.fromRGB(30, 30, 30),
-            Position = UDim2.new(0, 10, 0, 35),
-            Size = UDim2.new(1, -20, 0, 5)
+            BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+            Position = UDim2.new(0, 12, 0, 38),
+            Size = UDim2.new(1, -24, 0, 6)
         })
 
         Create("UICorner", {
@@ -253,7 +328,7 @@ function Library:CreateTab(name, icon)
 
         local Fill = Create("Frame", {
             Parent = SliderBar,
-            BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+            BackgroundColor3 = Color3.fromRGB(65, 65, 65),
             Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
         })
 
@@ -265,12 +340,12 @@ function Library:CreateTab(name, icon)
         local Value = Create("TextLabel", {
             Parent = Slider,
             BackgroundTransparency = 1,
-            Position = UDim2.new(1, -50, 0, 5),
-            Size = UDim2.new(0, 40, 0, 20),
-            Font = Enum.Font.Gotham,
+            Position = UDim2.new(1, -62, 0, 8),
+            Size = UDim2.new(0, 50, 0, 20),
+            Font = Enum.Font.GothamSemibold,
             Text = tostring(default),
             TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextSize = 12
+            TextSize = 14
         })
 
         local function update(input)
