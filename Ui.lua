@@ -34,17 +34,21 @@ local ScreenGui = Create("ScreenGui", {
 local MainFrame = Create("Frame", {
     Name = "MainFrame", 
     Parent = ScreenGui,
-    BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+    BackgroundColor3 = Color3.fromRGB(25, 25, 30),
     BorderSizePixel = 0,
     Position = UDim2.new(0.5, -300, 0.5, -175),
     Size = UDim2.new(0, 600, 0, 350),
     ClipsDescendants = true
 })
 
--- Add Shadow and Rounding
 local Corner = Create("UICorner", {
     Parent = MainFrame,
     CornerRadius = UDim.new(0, 10)
+})
+
+local Blur = Create("BlurEffect", {
+    Parent = MainFrame,
+    Size = 10
 })
 
 local Shadow = Create("ImageLabel", {
@@ -54,7 +58,7 @@ local Shadow = Create("ImageLabel", {
     Size = UDim2.new(1, 30, 1, 30),
     Image = "rbxassetid://5554236805",
     ImageColor3 = Color3.fromRGB(0, 0, 0),
-    ImageTransparency = 0.5,
+    ImageTransparency = 0.6,
     ScaleType = Enum.ScaleType.Slice,
     SliceCenter = Rect.new(23, 23, 277, 277),
     SliceScale = 1
@@ -64,7 +68,7 @@ local Shadow = Create("ImageLabel", {
 local TitleBar = Create("Frame", {
     Name = "TitleBar",
     Parent = MainFrame,
-    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+    BackgroundColor3 = Color3.fromRGB(30, 30, 35),
     BorderSizePixel = 0,
     Size = UDim2.new(1, 0, 0, 35)
 })
@@ -95,16 +99,28 @@ local Title = Create("TextLabel", {
     TextXAlignment = Enum.TextXAlignment.Left
 })
 
+-- Add a close button
+local CloseButton = Create("TextButton", {
+    Parent = TitleBar,
+    BackgroundTransparency = 1,
+    Position = UDim2.new(1, -30, 0, 0),
+    Size = UDim2.new(0, 30, 1, 0),
+    Font = Enum.Font.GothamBold,
+    Text = "×",
+    TextColor3 = Color3.fromRGB(255, 255, 255),
+    TextSize = 20
+})
+
 -- Tab Container with gradient
 local TabContainer = Create("ScrollingFrame", {
     Name = "TabContainer",
     Parent = MainFrame,
-    BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+    BackgroundColor3 = Color3.fromRGB(35, 35, 40),
     BorderSizePixel = 0,
     Position = UDim2.new(0, 0, 0, 35),
-    Size = UDim2.new(0, 130, 1, -35),
+    Size = UDim2.new(0, 150, 1, -35),
     ScrollBarThickness = 2,
-    ScrollBarImageColor3 = Color3.fromRGB(75, 75, 75),
+    ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100),
     CanvasSize = UDim2.new(0, 0, 0, 0)
 })
 
@@ -134,10 +150,10 @@ local TabPadding = Create("UIPadding", {
 local ContentContainer = Create("Frame", {
     Name = "ContentContainer",
     Parent = MainFrame,
-    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+    BackgroundColor3 = Color3.fromRGB(30, 30, 35),
     BorderSizePixel = 0,
-    Position = UDim2.new(0, 130, 0, 35),
-    Size = UDim2.new(1, -130, 1, -35)
+    Position = UDim2.new(0, 150, 0, 35),
+    Size = UDim2.new(1, -150, 1, -35)
 })
 
 local ContentGradient = Create("UIGradient", {
@@ -183,35 +199,58 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 -- Toggle GUI Visibility with smooth fade
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Library.ToggleKey then
-        if ScreenGui.Enabled then
-            Tween(MainFrame, TweenInfo.new(0.2), {BackgroundTransparency = 1})
-            for _, obj in pairs(MainFrame:GetDescendants()) do
-                if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
-                    Tween(obj, TweenInfo.new(0.2), {BackgroundTransparency = 1, TextTransparency = 1, ImageTransparency = 1})
-                end
+local function toggleUI()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    
+    if ScreenGui.Enabled then
+        -- Fade out
+        local fadeTween = Tween(MainFrame, tweenInfo, {BackgroundTransparency = 1})
+        for _, obj in pairs(MainFrame:GetDescendants()) do
+            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                Tween(obj, tweenInfo, {
+                    BackgroundTransparency = 1,
+                    TextTransparency = 1,
+                    ImageTransparency = 1
+                })
             end
-            wait(0.2)
-            ScreenGui.Enabled = false
-        else
-            ScreenGui.Enabled = true
-            MainFrame.BackgroundTransparency = 1
-            for _, obj in pairs(MainFrame:GetDescendants()) do
-                if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
-                    obj.BackgroundTransparency = 1
-                    obj.TextTransparency = 1
-                    obj.ImageTransparency = 1
-                end
+        end
+        fadeTween.Completed:Wait()
+        ScreenGui.Enabled = false
+    else
+        -- Fade in
+        ScreenGui.Enabled = true
+        MainFrame.BackgroundTransparency = 1
+        for _, obj in pairs(MainFrame:GetDescendants()) do
+            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                obj.BackgroundTransparency = 1
+                obj.TextTransparency = 1
+                obj.ImageTransparency = 1
             end
-            Tween(MainFrame, TweenInfo.new(0.2), {BackgroundTransparency = 0})
-            for _, obj in pairs(MainFrame:GetDescendants()) do
-                if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
-                    Tween(obj, TweenInfo.new(0.2), {BackgroundTransparency = 0, TextTransparency = 0, ImageTransparency = obj:GetAttribute("DefaultTransparency") or 0})
-                end
+        end
+        
+        Tween(MainFrame, tweenInfo, {BackgroundTransparency = 0})
+        for _, obj in pairs(MainFrame:GetDescendants()) do
+            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                Tween(obj, tweenInfo, {
+                    BackgroundTransparency = 0,
+                    TextTransparency = 0,
+                    ImageTransparency = obj:GetAttribute("DefaultTransparency") or 0
+                })
             end
         end
     end
+end
+
+-- Update toggle key connection
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Library.ToggleKey then
+        toggleUI()
+    end
+end)
+
+-- Add close button functionality
+CloseButton.MouseButton1Click:Connect(function()
+    toggleUI()
 end)
 
 function Library:CreateWindow(info)
@@ -293,7 +332,7 @@ function Library:CreateTab(name, icon)
         local Slider = Create("Frame", {
             Name = "Slider",
             Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+            BackgroundColor3 = Color3.fromRGB(35, 35, 40),
             Size = UDim2.new(1, 0, 0, 55)
         })
 
@@ -316,7 +355,7 @@ function Library:CreateTab(name, icon)
 
         local SliderBar = Create("Frame", {
             Parent = Slider,
-            BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+            BackgroundColor3 = Color3.fromRGB(45, 45, 50),
             Position = UDim2.new(0, 12, 0, 38),
             Size = UDim2.new(1, -24, 0, 6)
         })
@@ -328,7 +367,7 @@ function Library:CreateTab(name, icon)
 
         local Fill = Create("Frame", {
             Parent = SliderBar,
-            BackgroundColor3 = Color3.fromRGB(65, 65, 65),
+            BackgroundColor3 = Color3.fromRGB(65, 140, 240), -- Modern blue color
             Size = UDim2.new((default - min)/(max - min), 0, 1, 0)
         })
 
@@ -378,7 +417,7 @@ function Library:CreateTab(name, icon)
         local Toggle = Create("Frame", {
             Name = "Toggle",
             Parent = Container,
-            BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+            BackgroundColor3 = Color3.fromRGB(35, 35, 40),
             Size = UDim2.new(1, 0, 0, 35)
         })
 
@@ -398,7 +437,7 @@ function Library:CreateTab(name, icon)
 
         local Switch = Create("TextButton", {
             Parent = Toggle,
-            BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+            BackgroundColor3 = Color3.fromRGB(45, 45, 50),
             Position = UDim2.new(1, -40, 0.5, -10),
             Size = UDim2.new(0, 30, 0, 20),
             Text = "",
