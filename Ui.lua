@@ -24,6 +24,49 @@ local function Tween(object, info, properties)
     return tween
 end
 
+-- Move the toggleUI function definition before creating UI elements
+local function toggleUI()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    
+    if ScreenGui.Enabled then
+        -- Fade out
+        local fadeTween = Tween(MainFrame, tweenInfo, {BackgroundTransparency = 1})
+        for _, obj in pairs(MainFrame:GetDescendants()) do
+            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                Tween(obj, tweenInfo, {
+                    BackgroundTransparency = 1,
+                    TextTransparency = 1,
+                    ImageTransparency = 1
+                })
+            end
+        end
+        wait(0.3) -- Wait for animation to complete
+        ScreenGui.Enabled = false
+    else
+        -- Fade in
+        ScreenGui.Enabled = true
+        MainFrame.BackgroundTransparency = 1
+        for _, obj in pairs(MainFrame:GetDescendants()) do
+            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                obj.BackgroundTransparency = 1
+                obj.TextTransparency = 1
+                obj.ImageTransparency = 1
+            end
+        end
+        
+        Tween(MainFrame, tweenInfo, {BackgroundTransparency = 0})
+        for _, obj in pairs(MainFrame:GetDescendants()) do
+            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
+                Tween(obj, tweenInfo, {
+                    BackgroundTransparency = 0,
+                    TextTransparency = 0,
+                    ImageTransparency = obj:GetAttribute("DefaultTransparency") or 0
+                })
+            end
+        end
+    end
+end
+
 -- Create Base GUI
 local ScreenGui = Create("ScreenGui", {
     Name = "SerenityHub",
@@ -99,7 +142,7 @@ local Title = Create("TextLabel", {
     TextXAlignment = Enum.TextXAlignment.Left
 })
 
--- Add a close button
+-- Create the close button before connecting its event
 local CloseButton = Create("TextButton", {
     Parent = TitleBar,
     BackgroundTransparency = 1,
@@ -110,6 +153,11 @@ local CloseButton = Create("TextButton", {
     TextColor3 = Color3.fromRGB(255, 255, 255),
     TextSize = 20
 })
+
+-- Connect close button click
+CloseButton.MouseButton1Click:Connect(function()
+    toggleUI()
+end)
 
 -- Tab Container with gradient
 local TabContainer = Create("ScrollingFrame", {
@@ -198,59 +246,11 @@ game:GetService("RunService").RenderStepped:Connect(function()
     end
 end)
 
--- Toggle GUI Visibility with smooth fade
-local function toggleUI()
-    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
-    
-    if ScreenGui.Enabled then
-        -- Fade out
-        local fadeTween = Tween(MainFrame, tweenInfo, {BackgroundTransparency = 1})
-        for _, obj in pairs(MainFrame:GetDescendants()) do
-            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
-                Tween(obj, tweenInfo, {
-                    BackgroundTransparency = 1,
-                    TextTransparency = 1,
-                    ImageTransparency = 1
-                })
-            end
-        end
-        fadeTween.Completed:Wait()
-        ScreenGui.Enabled = false
-    else
-        -- Fade in
-        ScreenGui.Enabled = true
-        MainFrame.BackgroundTransparency = 1
-        for _, obj in pairs(MainFrame:GetDescendants()) do
-            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
-                obj.BackgroundTransparency = 1
-                obj.TextTransparency = 1
-                obj.ImageTransparency = 1
-            end
-        end
-        
-        Tween(MainFrame, tweenInfo, {BackgroundTransparency = 0})
-        for _, obj in pairs(MainFrame:GetDescendants()) do
-            if obj:IsA("Frame") or obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("ImageLabel") then
-                Tween(obj, tweenInfo, {
-                    BackgroundTransparency = 0,
-                    TextTransparency = 0,
-                    ImageTransparency = obj:GetAttribute("DefaultTransparency") or 0
-                })
-            end
-        end
-    end
-end
-
--- Update toggle key connection
+-- Connect toggle key
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Library.ToggleKey then
         toggleUI()
     end
-end)
-
--- Add close button functionality
-CloseButton.MouseButton1Click:Connect(function()
-    toggleUI()
 end)
 
 function Library:CreateWindow(info)
