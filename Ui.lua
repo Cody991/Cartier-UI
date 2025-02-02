@@ -134,7 +134,8 @@ local Title = Create("TextLabel", {
     Text = "Serenity Hub",
     TextColor3 = Color3.fromRGB(255, 255, 255),
     TextSize = 14,
-    TextXAlignment = Enum.TextXAlignment.Left
+    TextXAlignment = Enum.TextXAlignment.Left,
+    ZIndex = 2
 })
 local CloseButton = Create("TextButton", {
     Parent = TitleBar,
@@ -144,7 +145,8 @@ local CloseButton = Create("TextButton", {
     Font = Enum.Font.GothamBold,
     Text = "×",
     TextColor3 = Color3.fromRGB(255, 255, 255),
-    TextSize = 20
+    TextSize = 20,
+    ZIndex = 2
 })
 
 -- Connect close button
@@ -188,6 +190,11 @@ local TabPadding = Create("UIPadding", {
     PaddingLeft = UDim.new(0, 8),
     PaddingRight = UDim.new(0, 8)
 })
+
+-- Update TabContainer CanvasSize based on content
+TabList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    TabContainer.CanvasSize = UDim2.new(0, 0, 0, TabList.AbsoluteContentSize.Y + 16)
+end)
 
 -- Content Container
 local ContentContainer = Create("ScrollingFrame", {
@@ -254,7 +261,8 @@ function Library:CreateTab(name, icon)
         TextColor3 = Color3.fromRGB(255, 255, 255),
         TextSize = 13,
         TextXAlignment = Enum.TextXAlignment.Left,
-        AutoButtonColor = false
+        AutoButtonColor = false,
+        ZIndex = 2
     })
     local TabCorner = Create("UICorner", {
         Parent = Tab,
@@ -265,7 +273,8 @@ function Library:CreateTab(name, icon)
         BackgroundColor3 = Theme.Colors.LightBg,
         BackgroundTransparency = 0.9,
         Size = UDim2.new(1, 0, 1, 0),
-        Visible = false
+        Visible = false,
+        ZIndex = 2
     })
     local HoverCorner = Create("UICorner", {
         Parent = Hover,
@@ -276,7 +285,8 @@ function Library:CreateTab(name, icon)
         BackgroundColor3 = Theme.Colors.Accent,
         Position = UDim2.new(0, 0, 0, 0),
         Size = UDim2.new(0, 3, 1, 0),
-        Visible = false
+        Visible = false,
+        ZIndex = 2
     })
     local SelectionCorner = Create("UICorner", {
         Parent = Selection,
@@ -303,6 +313,11 @@ function Library:CreateTab(name, icon)
         PaddingRight = UDim.new(0, 15),
         PaddingTop = UDim.new(0, 15)
     })
+    -- Update Container CanvasSize based on its content
+    ElementList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        Container.CanvasSize = UDim2.new(0, 0, 0, ElementList.AbsoluteContentSize.Y + 30)
+    end)
+
     Tab.MouseButton1Click:Connect(function()
         for _, t in pairs(Library.Tabs) do
             t.Container.Visible = false
@@ -320,7 +335,8 @@ function Library:CreateTab(name, icon)
             Parent = Container,
             BackgroundColor3 = Theme.Colors.SliderBg,
             Size = UDim2.new(1, 0, 0, 65),
-            Visible = true  -- Make sure slider is visible
+            Visible = true,
+            ZIndex = 2
         })
 
         -- Add slider title
@@ -333,7 +349,8 @@ function Library:CreateTab(name, icon)
             Text = info.Name,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 2
         })
 
         -- Add slider bar
@@ -341,14 +358,16 @@ function Library:CreateTab(name, icon)
             Parent = Slider,
             BackgroundColor3 = Theme.Colors.SliderBg,
             Position = UDim2.new(0, 12, 0, 40),
-            Size = UDim2.new(1, -24, 0, 6)
+            Size = UDim2.new(1, -24, 0, 6),
+            ZIndex = 2
         })
 
         -- Add slider fill
         local Fill = Create("Frame", {
             Parent = SliderBar,
             BackgroundColor3 = Theme.Colors.Accent,
-            Size = UDim2.new(0.5, 0, 1, 0)
+            Size = UDim2.new(0.5, 0, 1, 0),
+            ZIndex = 2
         })
 
         -- Add corners
@@ -388,7 +407,8 @@ function Library:CreateTab(name, icon)
             Parent = Container,
             BackgroundColor3 = Theme.Colors.ToggleBg,
             Size = UDim2.new(1, 0, 0, 50),
-            Visible = true  -- Make sure toggle is visible
+            Visible = true,
+            ZIndex = 2
         })
 
         -- Add toggle title
@@ -401,7 +421,8 @@ function Library:CreateTab(name, icon)
             Text = info.Name,
             TextColor3 = Color3.fromRGB(255, 255, 255),
             TextSize = 13,
-            TextXAlignment = Enum.TextXAlignment.Left
+            TextXAlignment = Enum.TextXAlignment.Left,
+            ZIndex = 2
         })
 
         -- Add toggle switch
@@ -411,7 +432,8 @@ function Library:CreateTab(name, icon)
             Position = UDim2.new(1, -52, 0.5, -10),
             Size = UDim2.new(0, 40, 0, 20),
             Text = "",
-            AutoButtonColor = false
+            AutoButtonColor = false,
+            ZIndex = 2
         })
 
         -- Add toggle circle
@@ -419,7 +441,8 @@ function Library:CreateTab(name, icon)
             Parent = Switch,
             BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             Position = UDim2.new(0, 2, 0.5, -8),
-            Size = UDim2.new(0, 16, 0, 16)
+            Size = UDim2.new(0, 16, 0, 16),
+            ZIndex = 2
         })
 
         -- Add corners
@@ -432,7 +455,6 @@ function Library:CreateTab(name, icon)
         Switch.MouseButton1Click:Connect(function()
             toggled = not toggled
             local pos = toggled and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
-            local color = toggled and Theme.Colors.SwitchOn or Theme.Colors.SwitchOff
             Circle:TweenPosition(pos, "Out", "Sine", 0.2, true)
             Switch:TweenSize(UDim2.new(0, 40, 0, 20), "Out", "Sine", 0.2, true)
             info.Callback(toggled)
